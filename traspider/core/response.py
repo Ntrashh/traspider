@@ -11,7 +11,7 @@ class Response:
 		self.request = request
 		self.meta = meta
 		self.response = response
-
+	
 	@property
 	def status_code(self):
 		return self.response.status
