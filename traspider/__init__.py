@@ -7,6 +7,7 @@ logger.add(sys.stdout, colorize=True,
            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <7}</level> | <level>{message}</level>")
 logger.info(
     """
+    
 								   __                        _     __         
 								  / /__________ __________  (_)___/ /__  _____
 								 / __/ ___/ __ `/ ___/ __ \/ / __  / _ \/ ___/
