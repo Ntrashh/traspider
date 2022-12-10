@@ -20,7 +20,8 @@ class Lexical:
 		self.__rule_len = len(self.__rule)
 		self.__rule_list = list(self.__rule)
 		self.__curr = self.__rule_list[self.__posit]
-		self.__index = -1
+		self.__index = 0
+		self.__lexical_word = list(self.lexical())
 
 	def lexical(self):
 		# 循环知道__curr为None
@@ -45,6 +46,7 @@ class Lexical:
 					   'value': self.__curr,
 					   'start': self.__posit, 'end': self.__posit + 1}
 				self.__next()
+		yield  {'type': 'eof', 'value': '', 'start': self.__posit, 'end': self.__posit}
 
 	def __next(self):
 		"""
@@ -61,23 +63,32 @@ class Lexical:
 		return self.__curr
 
 
-	def convert_to_ast(self,word_list):
-		"""将词法转换为ast"""
+	def convert_to_ast(self):
+		init_word = self.__get_lexical()
 		self.__add_index()
-		word = word_list[self.__index]
-		self.__add_index()
-		if word_list[self.__index]["type"] == "line":
-			fild_dict = self.__call_type(word["type"],word["value"])
-			print(fild_dict)
-		elif word_list[self.__index]["type"] == "lbrackets" and self.verify_star(word_list,"star") and self.verify_star(word_list,"rbrackets"):
-			print("成功")
+		nud_function = getattr(
+			self, f'_type_{init_word["type"]}')
+		left = nud_function(init_word["value"])
 
-		self.convert_to_ast(word_list)
+		curr_type = self.__get_lexical_type()
+		next_lex_fun = getattr(
+			self, f'_type_{curr_type}',None)
+		if curr_type != "eof":
+			if next_lex_fun is None:
+				raise ""
+			else:
+				self.__add_index()
+				left = next_lex_fun(left)
+				curr_type = self.__get_lexical_type()
+		return left
 
-	def verify_star(self,word_list,tag):
-		self.__add_index()
-		print(word_list[self.__index]["type"])
-		return word_list[self.__index]["type"] == tag
+	def __get_lexical(self,index=0):
+		return self.__lexical_word[self.__index+index]
+
+	def __get_lexical_type(self,index=0):
+		return self.__lexical_word[self.__index+index]["type"]
+
+
 
 
 	def __add_index(self):
@@ -92,20 +103,51 @@ class Lexical:
 			pass
 
 
-	def __type_unquoted_identifier(self,value):
+	def _type_unquoted_identifier(self,value):
 		return ast.field(value)
 
-	def __type_line(self):
-		pass
+	def _type_line(self,left):
+		"""如果标签是line进入这个方法"""
+		# 如果下一个标签是类型是不是star
+		if not self.__get_lexical_type() == "star":
+			right = self._parse_lin_rlbrack()
+			if left['type'] == 'subexpression':
+				left['children'].append(right)
+				return left
+			else:
+				return ast.subexpression([left, right])
 
-	def __type_lbrackets(self):
-		pass
+	def _parse_lin_rlbrack(self):
+		type = self.__get_lexical_type()
+		if type in ["unquoted_identifier", "star"]:
+			return self.convert_to_ast()
+
+	def _parse_arr_rlb(self):
+		if self.__get_lexical_type() == "line":
+			self.__verity_tag("line")
+			right = self._parse_lin_rlbrack()
+		return right
 
 	def __generate(self,left):
 		pass
 
+	def _type_lbrackets(self,left):
+		self.__verity_tag('star')
+		self.__verity_tag('rbrackets')
+		right = self._parse_arr_rlb()
+		return ast.arrexpression(left, right)
+
+	def __verity_tag(self,tag):
+		if self.__get_lexical_type() == tag:
+			self.__add_index()
+		else:
+			# TODO 处理错误
+			raise
+
 if __name__ == '__main__':
-	lexical = Lexical("data/data[*]/data")
-	lexical_list =  list(lexical.lexical())
-	lexical.convert_to_ast(reversed(lexical_list))
-	print(lexical_list)
+
+
+
+	lexical = Lexical("data/arts[*]/id")
+
+	print(lexical.convert_to_ast())
