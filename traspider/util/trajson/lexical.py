@@ -144,10 +144,39 @@ class Lexical:
 			# TODO 处理错误
 			raise
 
-if __name__ == '__main__':
+class Visit:
+	def __init__(self):
+		self._method_cache = {}
+
+	def visit(self,node,json_data):
+		node_type = node['type']
+		method = self._method_cache.get(node_type)
+		if method is None:
+			method = getattr(self,f"visit_{node_type}")
+			self._method_cache[node_type] = method
+		return method(node, json_data)
+
+	def visit_subexpression(self, node, value):
+		result = value
+		for node in node['children']:
+			result = self.visit(node, result)
+		return result
+
+	def visit_field(self, node, value):
+		try:
+			return value.get(node['value'])
+		except AttributeError:
+			return None
+
+	def visit_arrexpression(self, node, value):
+		base = self.visit(node['children'][0], value)
+		if not isinstance(base, list):
+			return None
+		collected = []
+		for element in base:
+			current = self.visit(node['children'][1], element)
+			if current is not None:
+				collected.append(current)
+		return collected
 
 
-
-	lexical = Lexical("data/arts[*]/id")
-
-	print(lexical.convert_to_ast())

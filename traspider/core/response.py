@@ -2,6 +2,8 @@ import json
 from lxml import etree
 import chardet
 
+from traspider.util import TraJson
+
 from traspider.util.element import Element
 
 
@@ -17,7 +19,8 @@ class Response:
 		return self.response.status
 
 	def json(self):
-		return json.loads(self.content.decode())
+		json_data =  json.loads(self.content.decode())
+		return TraJson(json_data)
 
 	def text(self, encoding=None):
 		"""自动解析html编码"""
