@@ -10,7 +10,7 @@ class TraJson(dict):
 			lexical = Lexical(xpath_str)
 			ast_obj = lexical.convert_to_ast()
 			visit = Visit()
-			print(visit.visit(ast_obj,self))
+			return visit.visit(ast_obj,self)
 
 
 
