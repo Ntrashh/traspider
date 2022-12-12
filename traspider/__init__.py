@@ -4,6 +4,7 @@ import sys
 
 
 from traspider.util.log import Logging
+from traspider.util.node_vm.node import Node
 
 print(
 	"""
@@ -23,6 +24,7 @@ sys.path.insert(0, re.sub(r"([\\/]items)|([\\/]spiders)", "", os.getcwd()))
 
 __all__ = [
 	"Logging",
+	"Node"
 ]
 
 __version__ = "0.0.01"
