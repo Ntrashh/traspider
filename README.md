@@ -2,6 +2,22 @@
 
 
 
+**spider.node属性**
+
+在我们爬取数据中经常会遇到加密参数,self.node就是加载需要运行的js文件来获取加密参数
+
+在spider中可以这样实例化一个node对象,node对象是可以帮助我们运行我们需要调用的js文件,在下载件中间件`download_middleware`中来添加加密参数
+```python
+class MySpider(Spider):
+    def __init__(self):
+        self.paging = True
+        self.node = Node("需要加载的js文件")
+       
+        
+    async def download_middleware(self, request):
+        request.params["sign"] = self.node.call_node(func_name,"arg1","arg2")
+        return request
+```
 
 
 
