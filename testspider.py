@@ -20,11 +20,24 @@ class TestSpider(spider.Spider):
 		yield Request(method="GET", url=url, callback=self.parser)
 
 	def parser(self, response, request):
-		for req in self.generate_total_Request(request=request,data=request.url,total=100,size=1,key="pageNo"):
+		for req in self.generate_total_Request(request=request,data=request.params,total=100,size=10,key="pageNo"):
+			yield req
+
+		total = response.json().xpath("total")
+		for req in self.generate_total_Request(request=request,data=request.params,total=total,size=10,key="pageNo"):
 			yield req
 
 
-		item = {}
+		for i in range(1,all_page+1):
+			params  = {
+				"pageNo": i,
+				"pageSize": 10,
+				"area": "",
+				"publishTimeStart": "",
+				"publishTimeEnd": "",
+				"title": ""
+			}
+			yield Request(url="https://www.xxxxxx.com/search",params=params,callback=self.parser)
 		# legal_name = response.json().xpath("creditinfo[*]/legal_name")
 		# for name in legal_name:
 		# 	item["name"] = name
