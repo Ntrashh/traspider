@@ -2,6 +2,9 @@
 
 
 
+**self.save_path属性**
+save_path属性是用来设置爬虫文件的保存格式的,目前只支持`csv`和`txt`两种格式的文件,如果设置了save_path属性,则爬虫文件就会保存,否则就不会保存数据
+
 **spider.node属性**
 
 在我们爬取数据中经常会遇到加密参数,self.node就是加载需要运行的js文件来获取加密参数
@@ -95,3 +98,16 @@ def parser(self, response, request):
     for req in self.generate_total_Request(request=request,data=request.data,total=total,size=10,key="pageNo"):
         yield req
 ```
+
+
+### 鸣谢
+
+[hoopa](https://github.com/fishtn/hoopa)
+
+[feapder](https://github.com/Boris-code/feapder)
+
+[aioScrapy](https://github.com/ScrapingBoot/aioScrapy)
+
+[scrapy](https://github.com/scrapy/scrapy)
+
+[huangjin](https://github.com/xianyucoder)
