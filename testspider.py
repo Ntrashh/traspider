@@ -11,7 +11,7 @@ from traspider.core.request import Request
 
 class TestSpider(spider.Spider):
 	def __init__(self):
-		self.save_path = "demo.txt"
+		self.save_path = "demo.csa"
 		self.urls = [f"https://www.gongbiaoku.com/search?pageNo={i}&query=&status=&itemCatIds=1190&orderField=top&asc=0&style=" for i in range(100)]
 
 
@@ -57,6 +57,10 @@ class TestSpider(spider.Spider):
 		# if len(next_url) == 0:
 		# 	return
 		# yield Request(url="https://www.imau.edu.cn/zhxw/"+next_url[0],callback=self.parser)
+
+	async def download_middleware(self,request):
+		return request
+
 
 
 	def parse_detail(self,response,request):

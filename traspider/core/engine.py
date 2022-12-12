@@ -11,7 +11,7 @@ from traspider.core.scheduler import Scheduler
 class Engine:
 	def __init__(self, spider):
 		self.logging = Logging()
-		self.spider = spider
+		self.spider  = spider
 		self.scheduler = Scheduler()
 		self.download = Download()
 		self.task_num = 5
@@ -29,7 +29,7 @@ class Engine:
 		:param request:
 		:return:
 		"""
-		response = await self.download.download(request)
+		response = await self.download.download(self.spider,request)
 		if response is None:
 			return
 		if isinstance(response,Request):

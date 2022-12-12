@@ -12,19 +12,17 @@ from traspider.core.response import Response
 class Download:
 	def __init__(self):
 		self.encrypt = Encrypt()
-		self.queue = Queue()
 		self.count = 0
 		self.dedup = set()  # url去重
 		self.error = dict()  # 重试链接
 		self.error_count = 0
 
-	async def download(self, request):
+	async def download(self, spider,request):
 		"""
 		在这里可以处理下载前和下载后的处理
 		:return:
 		"""
-
-
+		request = await spider.download_middleware(request)
 		response = await self.crawl(request)
 		# TODO 在这里做下载中间件之后的处理
 		return response

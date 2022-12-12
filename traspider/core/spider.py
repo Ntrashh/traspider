@@ -7,6 +7,7 @@ class Spider:
 
 	def __init__(self):
 		self.urls = []
+		self.save_path = None
 
 
 	def start_request(self):
@@ -18,7 +19,9 @@ class Spider:
 		pass
 
 
-
+	def download_middleware(self,request):
+		"""爬虫下载器中间件"""
+		return request
 
 	def start(self):
 
