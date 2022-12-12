@@ -1,7 +1,6 @@
 from traspider.core.engine import Engine
 from traspider.core.request import Request
 from traspider.core.response import Response
-from node_vm2 import NodeVM
 
 from traspider.util.node_vm.node import Node
 
@@ -10,6 +9,7 @@ class Spider:
 	def __init__(self):
 		self.urls = []
 		self.save_path = None
+		self.paging = True
 		self.node = Node()
 
 	def start_request(self):
@@ -25,6 +25,31 @@ class Spider:
 
 	def call_node(self, func, *args, **kwargs):
 		return self.node.call_node(func, *args, **kwargs)
+
+	def generate_total_Request(self, request=None, data=None, total=None, size=None, key=None):
+		if not self.paging:
+			return []
+		self.paging = False
+		if isinstance(data, str) and request.url == data:
+			for page in range(2, total):
+				url_obj = request.parse_url(data)
+				print("标记",request.url)
+				url_obj["query"][key] = page
+				request.url = url_obj["url"]
+				request.params = url_obj["query"]
+				yield request
+		else:
+			all_page = total // size if total % size == 0 else total // size + 1
+			for page in range(1, all_page + 1):
+				data[key] = page
+				if request.data == data:
+					request.data = data
+					yield request
+				elif request.params == data:
+					request.params = data
+					yield request
+				else:
+					raise
 
 	def start(self):
 		engine = Engine(spider=self)

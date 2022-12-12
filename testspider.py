@@ -8,48 +8,30 @@ from traspider.core.request import Request
 
 class TestSpider(spider.Spider):
 	def __init__(self):
-
-		self.save_path = "demo.csa"
-		
+		self.urls = []
+		self.save_path = ""
+		self.paging = True
 		self.node = Node("aa.js")
 
-
-		self.urls = [
-			f"https://www.gongbiaoku.com/search?pageNo={i}&query=&status=&itemCatIds=1190&orderField=top&asc=0&style="
-			for i in range(100)]
-
 	def start_request(self):
-		headers = {
-			"Accept": "application/json, text/javascript, */*; q=0.01",
-			"Accept-Language": "zh-CN,zh;q=0.9",
-			"Cache-Control": "no-cache",
-			"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-			"Origin": "http://ggzyjy.sc.gov.cn",
-			"Pragma": "no-cache",
-			"Proxy-Connection": "keep-alive",
-			"Referer": "http://ggzyjy.sc.gov.cn/cxgl/sincerity-creditinfo.html",
-			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-			"X-Requested-With": "XMLHttpRequest"
-		}
-		url = "http://ggzyjy.sc.gov.cn/WebBuilder/rest/credit/getList"
-		for i in range(1, 100):
-			data = {
-				"name": "",
-				"code": "",
-				"type": "00",
-				"sttime": "",
-				"endtime": "",
-				"pageSize": "15",
-				"index": i
-			}
-			yield Request(method="POST", url=url, data=data, headers=headers, callback=self.parser)
+
+		url = "https://www.gongbiaoku.com/search?pageNo=1&query=&status=&itemCatIds=1190&orderField=top&asc=0&style="
+
+		yield Request(method="GET", url=url, callback=self.parser)
 
 	def parser(self, response, request):
+		for req in self.generate_total_Request(request=request,data=request.url,total=100,size=1,key="pageNo"):
+			yield req
+
+
 		item = {}
-		legal_name = response.json().xpath("creditinfo[*]/legal_name")
-		for name in legal_name:
-			item["name"] = name
-			yield item
+		# legal_name = response.json().xpath("creditinfo[*]/legal_name")
+		# for name in legal_name:
+		# 	item["name"] = name
+		# 	logger.info(item)
+		# # 	yield item
+		# for i in range(1,101):
+		# 	yield Request(url=f"https://www.gongbiaoku.com/search?pageNo={i}&query=&status=&itemCatIds=1190&orderField=top&asc=0&style=", callback=self.parser)
 
 	# pass
 	# if response is None:
@@ -63,6 +45,22 @@ class TestSpider(spider.Spider):
 	# yield Request(url="https://www.imau.edu.cn/zhxw/"+next_url[0],callback=self.parser)
 
 	async def download_middleware(self, request):
+		request.headers = {
+			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+			"Accept-Language": "zh-CN,zh;q=0.9",
+			"Cache-Control": "no-cache",
+			"Connection": "keep-alive",
+			"Pragma": "no-cache",
+			"Sec-Fetch-Dest": "document",
+			"Sec-Fetch-Mode": "navigate",
+			"Sec-Fetch-Site": "none",
+			"Sec-Fetch-User": "?1",
+			"Upgrade-Insecure-Requests": "1",
+			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+			"sec-ch-ua": "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\"",
+			"sec-ch-ua-mobile": "?0",
+			"sec-ch-ua-platform": "\"Windows\""
+		}
 		return request
 
 	def parse_detail(self, response, request):
@@ -74,6 +72,5 @@ class TestSpider(spider.Spider):
 if __name__ == '__main__':
 	start = time.time()
 	t = TestSpider()
-	print(t.call_node("cc", "a", "b", "c", "d"))
-
+	t.start()
 	logger.info(f"end:{start - time.time()}")
