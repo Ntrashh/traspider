@@ -2,7 +2,10 @@ import time
 
 from loguru import logger
 
-from traspider import spider
+from traspider.core import spider
+
+
+
 from traspider.core.request import Request
 
 

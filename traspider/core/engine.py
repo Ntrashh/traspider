@@ -1,5 +1,8 @@
 import asyncio
+
 from loguru import logger
+
+from traspider import Logging
 from traspider.core.download import Download
 from traspider.core.request import Request
 from traspider.core.scheduler import Scheduler
@@ -7,6 +10,7 @@ from traspider.core.scheduler import Scheduler
 
 class Engine:
 	def __init__(self, spider):
+		self.logging = Logging()
 		self.spider = spider
 		self.scheduler = Scheduler()
 		self.download = Download()
