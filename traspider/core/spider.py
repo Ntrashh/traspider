@@ -1,7 +1,8 @@
-from traspider.core.engine import Engine
+from traspider import Engine
+
 from traspider.core.request import Request
 from traspider.core.response import Response
-from traspider.util.myexception import WrongParameter
+from traspider.util.exception import WrongParameter
 
 from traspider.util.node_vm.node import Node
 
@@ -34,12 +35,13 @@ class Spider:
 		if isinstance(data, str) and request.url == data:
 			for page in range(2, total):
 				url_obj = request.parse_url(data)
-				print("标记",request.url)
 				url_obj["query"][key] = page
 				request.url = url_obj["url"]
 				request.params = url_obj["query"]
 				yield request
 		else:
+			if data is None:
+				raise WrongParameter('<data cannot be None>')
 			all_page = total // size if total % size == 0 else total // size + 1
 			for page in range(1, all_page + 1):
 				data[key] = page

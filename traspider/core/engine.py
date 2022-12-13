@@ -2,11 +2,12 @@ import asyncio
 
 from loguru import logger
 import csv
-from traspider import Logging
+
+from traspider.util.log import Logging
 from traspider.core.download import Download
 from traspider.core.request import Request
 from traspider.core.scheduler import Scheduler
-from traspider.util.myexception import FileTypeUnsupported
+from traspider.util.exception import FileTypeUnsupported
 
 
 class Engine:

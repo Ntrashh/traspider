@@ -1,10 +1,8 @@
-import asyncio
 import json
-from asyncio import Queue
+import time
+
 import aiohttp
-
 from traspider.util import Encrypt
-
 from loguru import logger
 from traspider.core.response import Response
 
@@ -38,8 +36,11 @@ class Download:
 			) as session:
 				if not self.error.get(fingerprint_md5):
 					self.count += 1
+				star = time.time()
 				response = await session.request(method=request.method.upper(), url=request.url, params=request.params,
 												 data = request.data)
+				logger.info(f"""<response: <Response {response.status}>> request:{request.url}
+								请求次数:{self.error.get(fingerprint_md5,1)}""")
 				self.dedup.add(self.__encrypt_request(request))
 				return Response(content=await response.read(), request=request, meta=request.meta, response=response)
 		except aiohttp.client_exceptions.ClientOSError as e:

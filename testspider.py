@@ -9,7 +9,7 @@ from traspider.core.request import Request
 class TestSpider(spider.Spider):
 	def __init__(self):
 		self.urls = []
-		self.save_path = "aa.js"
+		self.save_path = ""
 		self.paging = True
 		self.node = Node("aa.js")
 
@@ -20,24 +20,24 @@ class TestSpider(spider.Spider):
 		yield Request(method="GET", url=url, callback=self.parser)
 
 	def parser(self, response, request):
-		for req in self.generate_total_Request(request=request,data=request.params,total=100,size=10,key="pageNo"):
+		for req in self.generate_total_Request(request=request,data=request.url,total=100,size=1,key="pageNo"):
 			yield req
 
-		total = response.json().xpath("total")
-		for req in self.generate_total_Request(request=request,data=request.params,total=total,size=10,key="pageNo"):
-			yield req
+		# total = response.json().xpath("total")
+		# for req in self.generate_total_Request(request=request,data=request.params,total=total,size=10,key="pageNo"):
+		# 	yield req
 
 
-		for i in range(1,all_page+1):
-			params  = {
-				"pageNo": i,
-				"pageSize": 10,
-				"area": "",
-				"publishTimeStart": "",
-				"publishTimeEnd": "",
-				"title": ""
-			}
-			yield Request(url="https://www.xxxxxx.com/search",params=params,callback=self.parser)
+		# for i in range(1,all_page+1):
+		# 	params  = {
+		# 		"pageNo": i,
+		# 		"pageSize": 10,
+		# 		"area": "",
+		# 		"publishTimeStart": "",
+		# 		"publishTimeEnd": "",
+		# 		"title": ""
+		# 	}
+		# 	yield Request(url="https://www.xxxxxx.com/search",params=params,callback=self.parser)
 		# legal_name = response.json().xpath("creditinfo[*]/legal_name")
 		# for name in legal_name:
 		# 	item["name"] = name

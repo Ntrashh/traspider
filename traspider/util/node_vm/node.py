@@ -1,6 +1,6 @@
 from node_vm2 import VM
 
-from traspider.util.myexception import FileTypeUnsupported
+from traspider.util.exception import FileTypeUnsupported
 
 
 class Node:
