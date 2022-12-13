@@ -15,6 +15,7 @@ class TestSpider(spider.Spider):
 			"db": "",
 			"table":"",
 		}
+		self.task_num = 10
 		# {
 		# 	"host": "127.0.0.1",
 		# 	"port": 3306,
@@ -31,7 +32,7 @@ class TestSpider(spider.Spider):
 		self.node = Node()
 
 	def parser(self, response, request):
-		clearfixs = response.xpath("//li[@class='clearfix']").extract_first()
+		clearfixs = response.xpath("//li[@class='clearfix']")
 		print(clearfixs)
 		# for clearfix in clearfixs:
 		# 	print(clearfix.xpath(".//a[@class='line fl']/text()").extract_first())

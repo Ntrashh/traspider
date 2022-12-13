@@ -16,11 +16,12 @@ class Spider:
 			"password": "",
 			"db": "",
 			"charset": "utf-8"
-		}
-		self.urls = []
-		self.save_path = None
+		} # mysql的配置
+		self.task_num = 10  # 批次处理的任务
+		self.urls = [] # 起始url
+		self.save_path = None # 需要保存的文件名称 只支持csv和txt
 		self.paging = True
-		self.node = Node()
+		self.node = Node() # 运行js的node
 
 	def start_request(self):
 		for url in self.urls:

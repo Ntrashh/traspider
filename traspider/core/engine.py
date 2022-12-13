@@ -18,7 +18,7 @@ class Engine:
 		self.spider  = spider
 		self.scheduler = Scheduler()
 		self.download = Download()
-		self.task_num = 5
+		self.task_num = spider.task_num
 		self.item_count = 0
 		self.loop = asyncio.get_event_loop()
 		self.task_list = []
@@ -64,10 +64,11 @@ class Engine:
 				raise TypeError("item only supports dicts and lists")
 		await self.process_item(item_list)
 
-	async def process_task(self, task):
-		self.task_list.append(task)
-		if len(self.task_list) == 100 or not await self.scheduler.scheduler_qsize():
+	async def process_future(self, future):
+		self.task_list.append(future)
+		if len(self.task_list) == self.task_num or not await self.scheduler.scheduler_qsize():
 			# 获取所有完成任务和未完成任务
+
 			dones, pending = await asyncio.wait(self.task_list)
 			# 如果有未完成任务在此等待
 			while pending:
@@ -117,8 +118,8 @@ class Engine:
 			await self.scheduler.add_scheduler(request)
 		while self.loop_flag or await self.scheduler.scheduler_qsize():
 			request = await self.scheduler.next_request()
-			task = asyncio.ensure_future(self.process_request(request))
-			await self.process_task(task)
+			future = asyncio.ensure_future(self.process_request(request))
+			await self.process_future(future)
 
 	def __init_save(self,save_path):
 		if save_path is None or save_path == "":
