@@ -29,7 +29,7 @@ class Response:
 			encoding = char_code.get('encoding', 'utf-8')
 			if encoding is None:
 				# 如果编码获取不到则抛出错误
-				raise TypeError
+				raise TypeError('<Unsupported encoding type, please specify encoding type.>')
 		return self.content.decode(encoding, errors='ignore')
 
 	def xpath(self, xpath_str):

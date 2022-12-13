@@ -6,6 +6,7 @@ from traspider import Logging
 from traspider.core.download import Download
 from traspider.core.request import Request
 from traspider.core.scheduler import Scheduler
+from traspider.util.myexception import FileTypeUnsupported
 
 
 class Engine:
@@ -87,7 +88,6 @@ class Engine:
 			await self.scheduler.add_scheduler(request)
 		while self.loop_flag or await self.scheduler.scheduler_qsize():
 			request = await self.scheduler.next_request()
-			# logger.info(request)
 			task = asyncio.ensure_future(self.process_request(request))
 			await self.process_task(task)
 
@@ -98,7 +98,7 @@ class Engine:
 		if suffisso in ['csv', "txt"]:
 			self.save_type = suffisso
 		else:
-			raise
+			raise FileTypeUnsupported(f'<{suffisso} is an unsupported file type>')
 
 
 	def start(self):

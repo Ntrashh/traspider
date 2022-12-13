@@ -9,7 +9,7 @@ from traspider.core.request import Request
 class TestSpider(spider.Spider):
 	def __init__(self):
 		self.urls = []
-		self.save_path = ""
+		self.save_path = "aa.js"
 		self.paging = True
 		self.node = Node("aa.js")
 

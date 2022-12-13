@@ -1,6 +1,7 @@
 from traspider.core.engine import Engine
 from traspider.core.request import Request
 from traspider.core.response import Response
+from traspider.util.myexception import WrongParameter
 
 from traspider.util.node_vm.node import Node
 
@@ -43,13 +44,13 @@ class Spider:
 			for page in range(1, all_page + 1):
 				data[key] = page
 				if request.data == data:
-					request.data = data
+					request.data[key] = page
 					yield request
 				elif request.params == data:
-					request.params = data
+					request.params[key] = page
 					yield request
 				else:
-					raise
+					raise WrongParameter('<Wrong parameter type, data can only be an attribute in the request>')
 
 	def start(self):
 		engine = Engine(spider=self)

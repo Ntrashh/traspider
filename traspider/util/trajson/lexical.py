@@ -75,7 +75,7 @@ class Lexical:
 			self, f'_type_{curr_type}',None)
 		if curr_type != "eof":
 			if next_lex_fun is None:
-				raise ""
+				raise TypeError('<Attributes not supported for parsing>')
 			else:
 				self.__add_index()
 				left = next_lex_fun(left)
@@ -93,14 +93,6 @@ class Lexical:
 
 	def __add_index(self):
 		self.__index += 1
-
-	def __call_type(self,type,value):
-		if type == "unquoted_identifier":
-			return self.__type_unquoted_identifier(value)
-		elif type == "line":
-			pass
-		elif type == "lbrackets":
-			pass
 
 
 	def _type_unquoted_identifier(self,value):
@@ -128,8 +120,6 @@ class Lexical:
 			right = self._parse_lin_rlbrack()
 		return right
 
-	def __generate(self,left):
-		pass
 
 	def _type_lbrackets(self,left):
 		self.__verity_tag('star')
@@ -142,7 +132,7 @@ class Lexical:
 			self.__add_index()
 		else:
 			# TODO 处理错误
-			raise
+			raise TypeError('<Syntax error, the list type only supports [*] expressions>')
 
 class Visit:
 	def __init__(self):

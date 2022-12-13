@@ -15,7 +15,7 @@ class Request:
 	def parse_url(self,url=None):
 		if url is None:
 			url = self.url
-		query = {i.split("=")[0]: i.split("=")[1]for i in parse.unquote(parse.urlsplit(url).query).split("&") if i }
+		query = {i.split("=")[0]: i.split("=")[1]for i in parse.unquote(parse.urlsplit(url).query).split("&") if i}
 		url = parse.urlparse(url)
 		return {
 			"url":url.scheme+"://"+url.netloc+url.path,
