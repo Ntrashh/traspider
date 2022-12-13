@@ -5,57 +5,34 @@ from traspider.core import spider
 from traspider.core.request import Request
 
 
-
 class TestSpider(spider.Spider):
 	def __init__(self):
-		self.urls = []
-		self.save_path = ""
+		self.mysql_setting = {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"table":"",
+		}
+		# {
+		# 	"host": "127.0.0.1",
+		# 	"port": 3306,
+		# 	"user": "root",
+		# 	"password": "root",
+		# 	"db": "tengxun",
+		# 	"table":"danmu",
+		# }
+		self.urls = ["https://dm.video.qq.com/barrage/base/z0044divzwu"]
+		self.save_path = "danmu.csv"
 		self.paging = True
-		self.node = Node("aa.js")
-
-	def start_request(self):
-
-		url = "https://www.gongbiaoku.com/search?pageNo=1&query=&status=&itemCatIds=1190&orderField=top&asc=0&style="
-
-		yield Request(method="GET", url=url, callback=self.parser)
+		self.node = Node()
 
 	def parser(self, response, request):
-		for req in self.generate_total_Request(request=request,data=request.url,total=100,size=1,key="pageNo"):
-			yield req
-
-		# total = response.json().xpath("total")
-		# for req in self.generate_total_Request(request=request,data=request.params,total=total,size=10,key="pageNo"):
-		# 	yield req
-
-
-		# for i in range(1,all_page+1):
-		# 	params  = {
-		# 		"pageNo": i,
-		# 		"pageSize": 10,
-		# 		"area": "",
-		# 		"publishTimeStart": "",
-		# 		"publishTimeEnd": "",
-		# 		"title": ""
-		# 	}
-		# 	yield Request(url="https://www.xxxxxx.com/search",params=params,callback=self.parser)
-		# legal_name = response.json().xpath("creditinfo[*]/legal_name")
-		# for name in legal_name:
-		# 	item["name"] = name
-		# 	logger.info(item)
-		# # 	yield item
-		# for i in range(1,101):
-		# 	yield Request(url=f"https://www.gongbiaoku.com/search?pageNo={i}&query=&status=&itemCatIds=1190&orderField=top&asc=0&style=", callback=self.parser)
-
-	# pass
-	# if response is None:
-	# 	return
-	# urls = response.xpath('//li[contains(@id,"line_u4_")]/a/@href').extract()
-	# for url in urls:
-	# 	yield Request(url="https://www.imau.edu.cn"+url.split("..")[-1],callback=self.parse_detail)
-	# next_url = response.xpath('//a[contains(text(),"下页")]/@href').extract()
-	# if len(next_url) == 0:
-	# 	return
-	# yield Request(url="https://www.imau.edu.cn/zhxw/"+next_url[0],callback=self.parser)
+		segment_index = response.json().xpath("segment_index")
+		for val in segment_index.values():
+			yield Request(url="https://dm.video.qq.com/barrage/segment/z0044divzwu/" + val["segment_name"],
+						  callback=self.parse_detail)
 
 	async def download_middleware(self, request):
 		request.headers = {
@@ -79,11 +56,18 @@ class TestSpider(spider.Spider):
 	def parse_detail(self, response, request):
 		if response is None:
 			return
-		logger.info(f"{response.status_code} 请求链接:{request.url}")
+
+		contents = response.json().xpath("barrage_list[*]/content")
+		ids = response.json().xpath("barrage_list[*]/id")
+		items = []
+		for id, content in zip(ids, contents):
+			item = {}
+			item["id"] = id
+			item["content"] = content
+			items.append(item)
+		yield items
 
 
 if __name__ == '__main__':
-	start = time.time()
 	t = TestSpider()
 	t.start()
-	logger.info(f"end:{start - time.time()}")

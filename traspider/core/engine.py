@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from loguru import logger
 import csv
@@ -8,6 +9,7 @@ from traspider.core.download import Download
 from traspider.core.request import Request
 from traspider.core.scheduler import Scheduler
 from traspider.util.exception import FileTypeUnsupported
+from traspider.util.tramysql.tramysql import AioMysql
 
 
 class Engine:
@@ -17,13 +19,15 @@ class Engine:
 		self.scheduler = Scheduler()
 		self.download = Download()
 		self.task_num = 5
+		self.item_count = 0
 		self.loop = asyncio.get_event_loop()
 		self.task_list = []
 		self.loop_flag = True
 		self.save_type = None
+		self.aiomysql = AioMysql(self.spider.mysql_setting)
+		self.mysql_switch = False
 
-	def next_request(self):
-		pass
+
 
 	async def process_request(self, request):
 		"""
@@ -67,15 +71,31 @@ class Engine:
 			self.task_list.clear()
 
 	async def process_item(self,item):
+		# asyncio.ensure_future(self.aiomysql.batchInsert(item))
+		await self.statistics_item(item)
+		# 判断是否开启mysql
+		if self.mysql_switch:
+			await self.aiomysql.batchInsert(item)
 		if self.save_type == "csv":
-			await self.write_csv(item)
+			asyncio.ensure_future(self.write_csv(item))
 		elif self.save_type == "txt":
-			await self.write_txt(item)
+			asyncio.ensure_future(self.write_txt(item))
+
+	async def statistics_item(self,item):
+		if isinstance(item,list):
+			self.item_count += len(item)
+		elif isinstance(item,dict):
+			self.item_count += 1
+		else:
+			raise TypeError("item only supports dicts and lists")
 
 	async def write_csv(self,item):
 		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
 			csv_obj = csv.writer(f)
-			csv_obj.writerow(item.values())
+			if isinstance(item,list):
+				csv_obj.writerows([i.values() for i in item])
+			else:
+				csv_obj.writerow(item.values())
 
 	async def write_txt(self,item):
 		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
@@ -85,6 +105,12 @@ class Engine:
 		return " ".join(item.values())+"\n"
 
 	async def engine(self, start_requests):
+		if await self.aiomysql.inspection_conn() is False:
+			return
+		elif await self.aiomysql.inspection_conn() is None:
+			self.mysql_switch = False
+		else:
+			self.mysql_switch = True
 		for request in start_requests:
 			await self.scheduler.add_scheduler(request)
 		while self.loop_flag or await self.scheduler.scheduler_qsize():
@@ -103,11 +129,13 @@ class Engine:
 
 
 	def start(self):
+		start = time.time()
 		logger.info(f"{'*'*20}爬虫启动{'*'*20}")
 		self.__init_save(self.spider.save_path)
 		start_requests = iter(self.spider.start_request())
 		self.loop.run_until_complete(self.loop.create_task(self.engine(start_requests)))
-		logger.info(f"""
-									总请求:{self.download.count}
-									错误请求:{self.download.error_count}
-					""")
+		logger.info(f"""request_count:{self.download.count}
+								error_request_count:{self.download.error_count}
+								storage_item:{self.item_count}
+								time_consuming:{time.time()-start}
+								""")

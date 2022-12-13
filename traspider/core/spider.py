@@ -9,6 +9,14 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 	def __init__(self):
+		self.mysql_setting = {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"charset": "utf-8"
+		}
 		self.urls = []
 		self.save_path = None
 		self.paging = True
