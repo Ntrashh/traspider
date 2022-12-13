@@ -98,9 +98,10 @@ class Engine:
 			csv_obj.writerows([i.values() for i in item])
 
 
-	async def write_txt(self,item):
+	async def write_txt(self,items):
 		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
-			f.write(await self.__dict_to_str(item))
+			write_data = [await self.__dict_to_str(item) for item in items]
+			f.writelines(write_data)
 
 	async def __dict_to_str(self,item):
 		return " ".join(item.values())+"\n"
@@ -122,11 +123,11 @@ class Engine:
 	def __init_save(self,save_path):
 		if save_path is None or save_path == "":
 			return
-		suffisso = save_path.split(".")[-1]
-		if suffisso in ['csv', "txt"]:
-			self.save_type = suffisso
+		_suf = save_path.split(".")[-1]
+		if _suf in ['csv', "txt"]:
+			self.save_type = _suf
 		else:
-			raise FileTypeUnsupported(f'<{suffisso} is an unsupported file type>')
+			raise FileTypeUnsupported(f'<{_suf} is an unsupported file type>')
 
 
 	def start(self):

@@ -38,11 +38,12 @@ class Spider:
 
 	def generate_total_Request(self, request=None, data=None, total=None, size=None, key=None):
 		if not self.paging:
-			return []
+			return
 		self.paging = False
 		if isinstance(data, str) and request.url == data:
 			for page in range(2, total):
 				url_obj = request.parse_url(data)
+
 				url_obj["query"][key] = page
 				request.url = url_obj["url"]
 				request.params = url_obj["query"]
@@ -54,10 +55,10 @@ class Spider:
 			for page in range(1, all_page + 1):
 				data[key] = page
 				if request.data == data:
-					request.data[key] = page
+					request.data = data
 					yield request
 				elif request.params == data:
-					request.params[key] = page
+					request.params = page
 					yield request
 				else:
 					raise WrongParameter('<Wrong parameter type, data can only be an attribute in the request>')
