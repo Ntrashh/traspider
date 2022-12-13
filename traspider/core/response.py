@@ -3,8 +3,7 @@ from lxml import etree
 import chardet
 
 from traspider.util import TraJson
-
-from traspider.util.element import Element
+from traspider.util.element.element import Element, ElementIter
 
 
 class Response:
@@ -32,6 +31,10 @@ class Response:
 				raise TypeError('<Unsupported encoding type, please specify encoding type.>')
 		return self.content.decode(encoding, errors='ignore')
 
-	def xpath(self, xpath_str):
+	def xpath(self, query):
 		root = etree.HTML(self.text())
-		return Element(root.xpath(xpath_str))
+		xpath_result = root.xpath(query)
+		if isinstance(xpath_result,list):
+			return ElementIter(xpath_result)
+		else:
+			return Element(xpath_result)

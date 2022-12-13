@@ -23,16 +23,18 @@ class TestSpider(spider.Spider):
 		# 	"db": "tengxun",
 		# 	"table":"danmu",
 		# }
-		self.urls = ["https://dm.video.qq.com/barrage/base/z0044divzwu"]
+		self.urls = [
+			"https://www.gongbiaoku.com/search?pageNo=1&query=&status=&itemCatIds=1190&orderField=top&asc=0&style="]  # ["https://dm.video.qq.com/barrage/base/z0044divzwu"]
+
 		self.save_path = "danmu.csv"
 		self.paging = True
 		self.node = Node()
 
 	def parser(self, response, request):
-		segment_index = response.json().xpath("segment_index")
-		for val in segment_index.values():
-			yield Request(url="https://dm.video.qq.com/barrage/segment/z0044divzwu/" + val["segment_name"],
-						  callback=self.parse_detail)
+		clearfixs = response.xpath("//li[@class='clearfix']").extract_first()
+		print(clearfixs)
+		# for clearfix in clearfixs:
+		# 	print(clearfix.xpath(".//a[@class='line fl']/text()").extract_first())
 
 	async def download_middleware(self, request):
 		request.headers = {
