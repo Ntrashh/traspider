@@ -50,14 +50,19 @@ class Engine:
 		:param request:发起请求的request
 		:return:
 		"""
-		results = request.callback(response, request)
-		if results is None:
+		item_list = []
+		callback_results = request.callback(response, request)
+		if callback_results is None:
 			return
-		for result in results:
+		for result in callback_results:
 			if isinstance(result, Request):
 				await self.scheduler.add_scheduler(result)
+			elif isinstance(result,dict):
+				self.item_count += 1
+				item_list.append(result)
 			else:
-				await self.process_item(result)
+				raise TypeError("item only supports dicts and lists")
+		await self.process_item(item_list)
 
 	async def process_task(self, task):
 		self.task_list.append(task)
@@ -71,8 +76,6 @@ class Engine:
 			self.task_list.clear()
 
 	async def process_item(self,item):
-		# asyncio.ensure_future(self.aiomysql.batchInsert(item))
-		await self.statistics_item(item)
 		# 判断是否开启mysql
 		if self.mysql_switch:
 			await self.aiomysql.batchInsert(item)
@@ -92,10 +95,8 @@ class Engine:
 	async def write_csv(self,item):
 		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
 			csv_obj = csv.writer(f)
-			if isinstance(item,list):
-				csv_obj.writerows([i.values() for i in item])
-			else:
-				csv_obj.writerow(item.values())
+			csv_obj.writerows([i.values() for i in item])
+
 
 	async def write_txt(self,item):
 		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:

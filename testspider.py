@@ -59,13 +59,12 @@ class TestSpider(spider.Spider):
 
 		contents = response.json().xpath("barrage_list[*]/content")
 		ids = response.json().xpath("barrage_list[*]/id")
-		items = []
 		for id, content in zip(ids, contents):
-			item = {}
-			item["id"] = id
-			item["content"] = content
-			items.append(item)
-		yield items
+			item = {
+				"id": id,
+				"content": content
+			}
+			yield item
 
 
 if __name__ == '__main__':
