@@ -11,11 +11,11 @@ class Response:
 		self.content = content
 		self.request = request
 		self.meta = meta
-		self.response = response
+		self.__response = response
 	
 	@property
 	def status_code(self):
-		return self.response.status
+		return self.__response.status
 
 	def json(self):
 		json_data =  json.loads(self.content.decode())

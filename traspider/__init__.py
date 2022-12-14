@@ -29,7 +29,8 @@ __all__ = [
 	"Spider",
 	"Request",
 	"Engine",
-	"exception"
+	"exception",
+	"Node"
 ]
 
 __version__ = "0.0.01"

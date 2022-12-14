@@ -15,19 +15,16 @@ from traspider.util.tramysql.tramysql import AioMysql
 class Engine:
 	def __init__(self, spider):
 		self.logging = Logging()
-		self.spider  = spider
+		self.spider = spider
 		self.scheduler = Scheduler()
-		self.download = Download()
-		self.task_num = spider.task_num
+		self.download = Download(spider.retry)
 		self.item_count = 0
 		self.loop = asyncio.get_event_loop()
-		self.task_list = []
-		self.loop_flag = True
+		self.__task_list = []
+		self.__loop_flag = True
 		self.save_type = None
 		self.aiomysql = AioMysql(self.spider.mysql_setting)
-		self.mysql_switch = False
-
-
+		self.__mysql_switch = False
 
 	async def process_request(self, request):
 		"""
@@ -35,10 +32,12 @@ class Engine:
 		:param request:
 		:return:
 		"""
-		response = await self.download.download(self.spider,request)
+		response = await self.download.download(self.spider, request)
+		# 如果下载器下载失败response为空
 		if response is None:
 			return
-		if isinstance(response,Request):
+		# 如果返回的是request类型则是重试的request  加入到队列中
+		if isinstance(response, Request):
 			await self.scheduler.add_scheduler(response)
 			return
 		await self.process_response(response, request)
@@ -52,12 +51,13 @@ class Engine:
 		"""
 		item_list = []
 		callback_results = request.callback(response, request)
+		# 如果callback的结果为空再次不会
 		if callback_results is None:
 			return
 		for result in callback_results:
 			if isinstance(result, Request):
 				await self.scheduler.add_scheduler(result)
-			elif isinstance(result,dict):
+			elif isinstance(result, dict):
 				self.item_count += 1
 				item_list.append(result)
 			else:
@@ -65,81 +65,65 @@ class Engine:
 		await self.process_item(item_list)
 
 	async def process_future(self, future):
-		self.task_list.append(future)
-		if len(self.task_list) == self.task_num or not await self.scheduler.scheduler_qsize():
+		self.__task_list.append(future)
+		if len(self.__task_list) == self.spider.task_num or not await self.scheduler.scheduler_qsize():
 			# 获取所有完成任务和未完成任务
 
-			dones, pending = await asyncio.wait(self.task_list)
+			dones, pending = await asyncio.wait(self.__task_list)
 			# 如果有未完成任务在此等待
 			while pending:
 				pass
-			self.loop_flag = False
-			self.task_list.clear()
+			self.__loop_flag = False
+			self.__task_list.clear()
 
-	async def process_item(self,item):
+	async def process_item(self, item):
 		# 判断是否开启mysql
-		if self.mysql_switch:
+		if self.__mysql_switch:
 			await self.aiomysql.batchInsert(item)
-		if self.save_type == "csv":
+		if self.spider.save_type == "csv":
 			asyncio.ensure_future(self.write_csv(item))
-		elif self.save_type == "txt":
+		elif self.spider.save_type == "txt":
 			asyncio.ensure_future(self.write_txt(item))
 
-	async def statistics_item(self,item):
-		if isinstance(item,list):
-			self.item_count += len(item)
-		elif isinstance(item,dict):
-			self.item_count += 1
-		else:
-			raise TypeError("item only supports dicts and lists")
-
-	async def write_csv(self,item):
-		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
+	async def write_csv(self, item):
+		with open(self.spider.save_path, "a+", newline="", encoding="utf-8") as f:
 			csv_obj = csv.writer(f)
 			csv_obj.writerows([i.values() for i in item])
 
-
-	async def write_txt(self,items):
-		with open(self.spider.save_path,"a+",newline="",encoding="utf-8")as f:
+	async def write_txt(self, items):
+		with open(self.spider.save_path, "a+", newline="", encoding="utf-8") as f:
 			write_data = [await self.__dict_to_str(item) for item in items]
 			f.writelines(write_data)
 
-	async def __dict_to_str(self,item):
-		return " ".join(item.values())+"\n"
+	async def __dict_to_str(self, item):
+		return " ".join(item.values()) + "\n"
 
 	async def engine(self, start_requests):
 		if await self.aiomysql.inspection_conn() is False:
 			return
 		elif await self.aiomysql.inspection_conn() is None:
-			self.mysql_switch = False
+			self.__mysql_switch = False
 		else:
-			self.mysql_switch = True
+			self.__mysql_switch = True
 		for request in start_requests:
 			await self.scheduler.add_scheduler(request)
-		while self.loop_flag or await self.scheduler.scheduler_qsize():
+		while self.__loop_flag or await self.scheduler.scheduler_qsize():
 			request = await self.scheduler.next_request()
 			future = asyncio.ensure_future(self.process_request(request))
 			await self.process_future(future)
 
-	def __init_save(self,save_path):
-		if save_path is None or save_path == "":
-			return
-		_suf = save_path.split(".")[-1]
-		if _suf in ['csv', "txt"]:
-			self.save_type = _suf
-		else:
-			raise FileTypeUnsupported(f'<{_suf} is an unsupported file type>')
 
 
 	def start(self):
 		start = time.time()
-		logger.info(f"{'*'*20}爬虫启动{'*'*20}")
-		self.__init_save(self.spider.save_path)
+		logger.info(f"{'*' * 20}爬虫启动{'*' * 20}")
+		logger.info(self.spider.save_type)
+		# self.__init_save(self.spider.save_path)
 		start_requests = iter(self.spider.start_request())
 		self.loop.run_until_complete(self.loop.create_task(self.engine(start_requests)))
 		logger.info(f"""spider end ...
 								request_count:{self.download.count}
 								error_request_count:{self.download.error_count}
 								storage_item:{self.item_count}
-								time_consuming:{time.time()-start}
+								time_consuming:{time.time() - start}
 								""")

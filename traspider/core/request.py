@@ -2,15 +2,17 @@ from urllib import parse
 
 
 class Request:
-	def __init__(self,url,callback,method = None,headers=None, params=None, data=None, timeout=3,meta = {}):
+	def __init__(self,url,callback,method = None,headers=None, params=None, data=None,proxy=None,timeout=3,meta = {}):
 		self.url = url
 		self.method = method or "GET"
 		self.headers = headers
 		self.params = params
 		self.data = data
+		self.proxy = proxy
 		self.timeout = timeout
 		self.callback = callback
 		self.meta = meta
+
 
 	def parse_url(self,url=None):
 		if url is None:

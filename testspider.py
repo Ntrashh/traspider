@@ -7,6 +7,7 @@ from traspider.core.request import Request
 
 class TestSpider(spider.Spider):
 	def __init__(self):
+		self.task_num = 10
 		self.mysql_setting = {
 			"host": "",
 			"port": "",
@@ -15,25 +16,18 @@ class TestSpider(spider.Spider):
 			"db": "",
 			"table":"",
 		}
-		self.task_num = 10
-		# {
-		# 	"host": "127.0.0.1",
-		# 	"port": 3306,
-		# 	"user": "root",
-		# 	"password": "root",
-		# 	"db": "tengxun",
-		# 	"table":"danmu",
-		# }
 		self.urls = [
 			"https://www.gongbiaoku.com/search?pageNo=1&query=&status=&itemCatIds=1190&orderField=top&asc=0&style="]  # ["https://dm.video.qq.com/barrage/base/z0044divzwu"]
-
-		self.save_path = "danmu.csv"
-		self.paging = True
+		self.retry = 10
+		self.save_path = ""
+		# self.paging = True
 		self.node = Node()
 
 	def parser(self, response, request):
-		clearfixs = response.xpath("//li[@class='clearfix']")
-		print(clearfixs)
+
+		for i in self.generate_total_Request(request,request.url,100,1,"pageNo"):
+			print(i)
+		# clearfixs = response.xpath("//li[@class='clearfix']")
 		# for clearfix in clearfixs:
 		# 	print(clearfix.xpath(".//a[@class='line fl']/text()").extract_first())
 

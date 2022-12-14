@@ -9,19 +9,9 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 	def __init__(self):
-		self.mysql_setting = {
-			"host": "",
-			"port": "",
-			"user": "",
-			"password": "",
-			"db": "",
-			"charset": "utf-8"
-		} # mysql的配置
 		self.task_num = 10  # 批次处理的任务
-		self.urls = [] # 起始url
-		self.save_path = None # 需要保存的文件名称 只支持csv和txt
-		self.paging = True
-		self.node = Node() # 运行js的node
+		self.urls = []  # 起始url
+		self.node = Node()  # 运行js的node
 
 	def start_request(self):
 		for url in self.urls:
@@ -63,6 +53,112 @@ class Spider:
 					yield request
 				else:
 					raise WrongParameter('<Wrong parameter type, data can only be an attribute in the request>')
+
+	@property
+	def retry(self):
+		if hasattr(self, "_Spider__retry"):
+			return self.__retry
+		return 100
+
+	@retry.setter
+	def retry(self, value):
+		if value < 0 and not isinstance(value, int):
+			raise ValueError('<The retry attribute must be an integer and greater than 0>')
+		self.__retry = value
+
+	@property
+	def paging(self):
+		if hasattr(self, "_Spider__paging"):
+			return self.__paging
+		return True
+
+	@paging.setter
+	def paging(self, value):
+		self.__paging = value
+
+	@property
+	def mysql_setting(self):
+		if hasattr(self, "_Spider__mysql_setting"):
+			return self.__mysql_setting
+		return {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"table": "",
+		}
+
+	@mysql_setting.setter
+	def mysql_setting(self, value):
+		if not isinstance(value, dict):
+			raise ValueError('<mysql_setting must be a dictionary type>')
+		if self.__check_mysql_setting_key(value):
+			missing_keys = self.__check_mysql_setting_key(value)
+			raise ValueError(f'<mysql_setting is missing the following fields:{missing_keys}>')
+		self.__mysql_setting = value
+
+	def __check_mysql_setting_key(self, mysql_setting: dict):
+		"""
+		检测mysql_setting中所需要的属性是否存在
+		:param mysql_setting:
+		:return:
+		"""
+		template = {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"table": "",
+		}
+		missing_keys = []
+		for key in template.keys():
+			if mysql_setting.get(key) is None:
+				missing_keys.append(key)
+		return missing_keys
+
+	@property
+	def save_path(self):
+		if hasattr(self, "_Spider__save_path"):
+			return self.__save_path
+		return ""
+
+	@save_path.setter
+	def save_path(self, value: str):
+		# 判断赋值路径是不是字符串
+		if not isinstance(value, str):
+			raise ValueError("<The save_path attribute only supports strings>")
+		if value == "":
+			self.__save_type = ""
+			self.__save_path = value
+			return
+		if '.' not in value or len(value.split(".")) < 2:
+			raise ValueError("<save_path is not a filename>")
+		file_type = value.split(".")[-1]
+		# 判断赋值的路径是不是csv或txt
+		if file_type not in ["csv", "txt"]:
+			raise ValueError(f'<{file_type} is an unsupported file type>')
+		self.__save_type = file_type
+		self.__save_path = value
+
+	@property
+	def save_type(self):
+		if hasattr(self, "_Spider__save_type"):
+			return self.__save_type
+		return ""
+
+	@property
+	def node(self):
+		if hasattr(self,"_Spider__node"):
+			return self.__node
+		return None
+
+	@node.setter
+	def node(self,value):
+		if not isinstance(value,Node):
+			raise ValueError('<The node attribute must be of Node class>')
+		self.__node = value
 
 	def start(self):
 		engine = Engine(spider=self)

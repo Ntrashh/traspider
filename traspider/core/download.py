@@ -8,14 +8,16 @@ from traspider.core.response import Response
 
 
 class Download:
-	def __init__(self):
+	def __init__(self, retry):
+
+		self.retry = retry
 		self.encrypt = Encrypt()
 		self.count = 0
 		self.dedup = set()  # url去重
 		self.error = dict()  # 重试链接
 		self.error_count = 0
 
-	async def download(self, spider,request):
+	async def download(self, spider, request):
 		"""
 		在这里可以处理下载前和下载后的处理
 		:return:
@@ -36,11 +38,15 @@ class Download:
 			) as session:
 				if not self.error.get(fingerprint_md5):
 					self.count += 1
-				star = time.time()
-				response = await session.request(method=request.method.upper(), url=request.url, params=request.params,
-												 data = request.data)
+				response = await session.request(
+					method=request.method.upper(),
+					url=request.url,
+					params=request.params,
+					data=request.data,
+					proxy=request.proxy
+				)
 				logger.info(f"""<response: <Response {response.status}>> request:{request.url}
-								请求次数:{self.error.get(fingerprint_md5,1)}""")
+								请求次数:{self.error.get(fingerprint_md5, 1)}""")
 				self.dedup.add(self.__encrypt_request(request))
 				return Response(content=await response.read(), request=request, meta=request.meta, response=response)
 		except aiohttp.client_exceptions.ClientOSError as e:
@@ -52,9 +58,11 @@ class Download:
 			return request
 
 	def __error_retry(self, key):
-		if self.error.get(key) == 3:
+		# 如果重试的request指纹次数等于重试次数
+		if self.error.get(key) == self.retry:
 			self.error_count += 1
 			return True
+
 		if self.error.get(key) is None:
 			self.error[key] = 1
 		else:
