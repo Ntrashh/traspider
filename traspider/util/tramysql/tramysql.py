@@ -96,6 +96,9 @@ class AioMysql:
 		elif list(self.setting.values()).count("") == 6:
 			pass
 		else:
+			if not isinstance(self.setting["port"],int):
+				logger.error("port字段必须是int类型")
+				return False
 			pool = await self.register(self.setting)
 			if not pool is None:
 				logger.info("mysql初始化正常")

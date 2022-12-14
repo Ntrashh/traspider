@@ -1,3 +1,5 @@
+from loguru import logger
+
 from traspider import Engine
 
 from traspider.core.request import Request
@@ -15,7 +17,15 @@ class Spider:
 
 	def start_request(self):
 		for url in self.urls:
-			yield Request(url, callback=self.parser)
+			if isinstance(url,str):
+				yield Request(url, callback=self.parser)
+			elif isinstance(url,dict):
+				if url.get("url") is None:
+					raise ValueError(f"The url attribute in urls cannot be empty:{url}")
+				yield Request(url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parser)
+			else:
+				raise ValueError("<Only dictionaries and strings can be stored in urls>")
+
 
 	def parser(self, response: Response, request: Request):
 		pass

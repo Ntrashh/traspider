@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import time
 
 from loguru import logger
@@ -98,13 +99,26 @@ class Engine:
 	async def __dict_to_str(self, item):
 		return " ".join(item.values()) + "\n"
 
-	async def engine(self, start_requests):
-		if await self.aiomysql.inspection_conn() is False:
-			return
-		elif await self.aiomysql.inspection_conn() is None:
+	async def __init_mysql(self):
+		# 如果mysql的配置不正确不运行
+		conn_result = await self.aiomysql.inspection_conn()
+		if conn_result is False:
+			sys.exit()
+		elif conn_result is None:
 			self.__mysql_switch = False
 		else:
 			self.__mysql_switch = True
+
+	async def _init_db(self):
+		"""
+		初始化数据库配置,进行链接检测
+		:return:
+		"""
+		await self.__init_mysql()
+
+
+	async def engine(self, start_requests):
+		await self._init_db()
 		for request in start_requests:
 			await self.scheduler.add_scheduler(request)
 		while self.__loop_flag or await self.scheduler.scheduler_qsize():
@@ -117,8 +131,6 @@ class Engine:
 	def start(self):
 		start = time.time()
 		logger.info(f"{'*' * 20}爬虫启动{'*' * 20}")
-		logger.info(self.spider.save_type)
-		# self.__init_save(self.spider.save_path)
 		start_requests = iter(self.spider.start_request())
 		self.loop.run_until_complete(self.loop.create_task(self.engine(start_requests)))
 		logger.info(f"""spider end ...
