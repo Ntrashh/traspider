@@ -137,7 +137,8 @@ class Engine:
 		self.__init_save(self.spider.save_path)
 		start_requests = iter(self.spider.start_request())
 		self.loop.run_until_complete(self.loop.create_task(self.engine(start_requests)))
-		logger.info(f"""request_count:{self.download.count}
+		logger.info(f"""spider end ...
+								request_count:{self.download.count}
 								error_request_count:{self.download.error_count}
 								storage_item:{self.item_count}
 								time_consuming:{time.time()-start}
