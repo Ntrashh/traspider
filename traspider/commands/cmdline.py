@@ -18,7 +18,6 @@ def execute(argv=None):
 
     if argv is None:
         argv = sys.argv
-    print(argv)
     if len(argv) < 2:
         _print_commands()
         return

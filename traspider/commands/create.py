@@ -54,14 +54,11 @@ class CreateCommand:
 
 	def run_cmd(self):
 		args = self.parser.parse_args()
-		print(args)
-
 		if args.spider:
 			spider_name = args.spider[0]
 			create_type = "spider"
 		else:
 			raise
-		print("spider_name",spider_name)
 		# 检查spider_name
 		if not re.search("^[a-zA-Z][a-zA-Z0-9_]*$", spider_name):
 			raise Exception("命名不规范，请用下划线命名或驼峰命名方式")
