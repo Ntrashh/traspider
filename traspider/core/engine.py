@@ -18,7 +18,7 @@ class Engine:
 		self.logging = Logging()
 		self.spider = spider
 		self.scheduler = Scheduler()
-		self.download = Download(spider.retry)
+		self.download = Download(spider.retry,spider.time_out)
 		self.item_count = 0
 		self.loop = asyncio.get_event_loop()
 		self.__task_list = []
@@ -126,9 +126,21 @@ class Engine:
 			future = asyncio.ensure_future(self.process_request(request))
 			await self.process_future(future)
 
+	def __print_log(self):
+		print(
+			"""
 
+								   __                           _     __         
+								  / /___  ________ __________  (_)___/ /__  _____
+								 / __/  / ___/ __ `/ ___/ __ \/ / __  / _ \/ ___/
+								/ /_/  / /  / /_/ (__  ) /_/ / / /_/ /  __/ /    
+								\__/  /_/   \__,_/____/ .___/_/\__,_/\___/_/     
+												  /_/                         
+		"""
+		)
 
 	def start(self):
+		self.__print_log()
 		start = time.time()
 		logger.info(f"{'*' * 20}爬虫启动{'*' * 20}")
 		start_requests = iter(self.spider.start_request())

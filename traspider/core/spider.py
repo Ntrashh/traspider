@@ -11,7 +11,6 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 	def __init__(self):
-		self.task_num = 10  # 批次处理的任务
 		self.urls = []  # 起始url
 		self.node = Node()  # 运行js的node
 
@@ -169,6 +168,31 @@ class Spider:
 		if not isinstance(value,Node):
 			raise ValueError('<The node attribute must be of Node class>')
 		self.__node = value
+
+	@property
+	def task_num(self):
+		if hasattr(self, "_Spider__task_num"):
+			return self.__task_num
+		return 100
+
+	@task_num.setter
+	def task_num(self,value):
+		if value < 1 or value > 100:
+			raise ValueError("task_num can only be between 1-100")
+		self.__task_num = value
+
+	@property
+	def time_out(self):
+		if hasattr(self, "_Spider__time_out"):
+			return self.__time_out
+		return 5
+
+	@time_out.setter
+	def time_out(self, value):
+		if value < 1 or value > 20:
+			raise ValueError("time_out can only be between 1-20")
+		self.__time_out = value
+
 
 	def start(self):
 		engine = Engine(spider=self)
