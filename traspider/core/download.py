@@ -46,7 +46,7 @@ class Download:
 					params=request.params,
 					data=request.data,
 					proxy=request.proxy,
-					timeout = 5
+					timeout = self.time_out
 				)
 				logger.info(f"""<response: <Response {response.status}>> request:{request.url}
 								请求次数:{self.error.get(fingerprint_md5, 0)+1}""")
@@ -59,7 +59,7 @@ class Download:
 		except asyncio.exceptions.TimeoutError as e:
 			logger.error("请求超时!")
 		if not self.__error_retry(fingerprint_md5):
-			logger.info(f"<重试请求:url={request.url} params={request.params} data={request.data}>")
+			logger.info(f"<重试请求次数:{self.error.get(fingerprint_md5, 0)}  url={request.url} params={request.params} data={request.data}>")
 			return request
 
 	def __error_retry(self, key):

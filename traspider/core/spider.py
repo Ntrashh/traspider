@@ -11,8 +11,8 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 	def __init__(self):
-		self.urls = []  # 起始url
-		self.node = Node()  # 运行js的node
+		self.urls = []
+
 
 	def start_request(self):
 		for url in self.urls:
