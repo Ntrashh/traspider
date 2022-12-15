@@ -42,7 +42,7 @@ setup(
     license="MIT",
     install_requires=requires,
     packages=find_packages(),
-    include_package_data=True,  # 自动包含受版本控制(svn/git)的数据文件
+    include_package_data=True,
     zip_safe=False,
     classifiers=[
         "Framework :: AsyncIO",
