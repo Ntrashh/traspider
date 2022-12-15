@@ -1,8 +1,6 @@
 import sys
-import cProfile
-
 from traspider.commands.create import CreateCommand
-from traspider.util.exception import UsageError
+
 
 
 def _print_unknown_command(cmd_name):

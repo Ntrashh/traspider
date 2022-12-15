@@ -51,4 +51,5 @@ setup(
             "Programming Language :: Python :: 3",
             "Operating System :: OS Independent",
         ],
+    entry_points={"console_scripts": ["traspider = traspider.commands.cmdline:execute"]},
 )
