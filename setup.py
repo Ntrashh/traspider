@@ -52,6 +52,7 @@ setup(
     description="An out-of-the-box lightweight asynchronous crawler framework",
     python_requires=">=3.7",
     long_description=read("README.md"),
+    long_description_content_type="text/markdown",
     license="MIT",
     install_requires=requires,
     packages=find_packages(),
