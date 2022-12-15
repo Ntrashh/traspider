@@ -1,0 +1,22 @@
+
+from loguru import logger
+from traspider import Request, Spider
+
+class ${spider_class_name}(Spider):
+
+    def __init__(self):
+        self.urls  = []
+
+
+    def parser(self, response, request):
+        logger.info(response)
+
+    async def download_middleware(self, request):
+        request.headers = {
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+            }
+        return request
+
+if __name__ == "__main__":
+    ${spider_name} = ${spider_class_name}()
+    ${spider_name}.start()
