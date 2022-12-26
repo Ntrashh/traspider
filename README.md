@@ -20,7 +20,7 @@ pip3 install traspider
 ### 使用
 创建爬虫
 ```cmd
-traspider -s demo_spider
+traspider creat -s demo_spider
 ```
 
 生成代码

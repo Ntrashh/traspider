@@ -91,12 +91,12 @@ class AioMysql:
 		:return:
 		"""
 		if 0 < list(self.setting.values()).count("") < 6:
-			logger.error(f"mysql配置中有字段为空:{[key for key,val in self.setting.items() if val == '']}")
+			logger.error(f"mysql配置中有字段为空:{[key for key, val in self.setting.items() if val == '']}")
 			return False
 		elif list(self.setting.values()).count("") == 6:
 			pass
 		else:
-			if not isinstance(self.setting["port"],int):
+			if not isinstance(self.setting["port"], int):
 				logger.error("port字段必须是int类型")
 				return False
 			pool = await self.register(self.setting)
