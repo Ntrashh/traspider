@@ -78,6 +78,9 @@ class Engine:
 			self.__task_list.clear()
 
 	async def process_item(self, item):
+		if len(item) == 0:
+			return
+		
 		# 判断是否开启mysql
 		if self.__mysql_switch:
 			await self.aiomysql.batchInsert(item)
