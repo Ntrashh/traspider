@@ -19,7 +19,7 @@ class AioMysql:
 			pool = await aiomysql.create_pool(host=setting["host"], port=setting["port"],
 											  user=setting["user"], password=setting["password"],
 											  db=setting["db"], autocommit=False)
-			logger.info(f"{setting['host']}:{setting['port']}@{setting['db']}链接成功！")
+
 			return pool
 		except asyncio.CancelledError:
 			raise asyncio.CancelledError
@@ -101,6 +101,7 @@ class AioMysql:
 				return False
 			pool = await self.register(self.setting)
 			if not pool is None:
+				logger.info(f"{self.setting['host']}:{self.setting['port']}@{self.setting['db']}链接成功！")
 				logger.info("mysql初始化正常")
 				return True
 			else:

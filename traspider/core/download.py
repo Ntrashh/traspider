@@ -1,7 +1,5 @@
 import asyncio
 import json
-import time
-
 import aiohttp
 from traspider.util import Encrypt
 from loguru import logger
@@ -48,7 +46,7 @@ class Download:
 					proxy=request.proxy,
 					timeout = self.time_out
 				)
-				logger.info(f"""<response: <Response {response.status}>> request:{request.url}
+				logger.info(f"""<response: <Response {response.status}>> url:{request.url}
 								请求次数:{self.error.get(fingerprint_md5, 0)+1}""")
 				self.dedup.add(self.__encrypt_request(request))
 				return Response(content=await response.read(), request=request, meta=request.meta, response=response)

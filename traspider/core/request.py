@@ -1,3 +1,4 @@
+import json
 from urllib import parse
 
 
@@ -8,7 +9,7 @@ class Request:
         self.method = method or "GET"
         self.headers = headers
         self.params = params
-        self.data = data
+        self.__data = data
         self.proxy = proxy
         self.timeout = timeout
         self.callback = callback
@@ -24,4 +25,26 @@ class Request:
             "query": query
         }
 
-# 使用 urlencode() 函数可以将一个 dict 转换成合法的查询参数：
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self,value):
+        if value == "null":
+            self.__data = None
+        else:
+            self.__data = value
+
+    def __iter__(self):
+        return (i for i in
+                (self.method, self.url, self.params, self.data, self.proxy, self.meta, getattr(self.callback, "__name__")
+            if callable(self.callback)
+            else self.callback))
+
+    def __repr__(self):
+        class_name = type(self).__name__
+        return "{}(method:{!r}, url:{!r}, params:{!r}, data:{!r}, proxy:{!r}, meta:{!r}, callback:{!r})".format(
+            class_name,
+            *self
+        )

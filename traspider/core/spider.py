@@ -1,3 +1,4 @@
+import copy
 import json
 
 from loguru import logger
@@ -55,14 +56,19 @@ class Spider:
 				raise WrongParameter('<data cannot be None>')
 			all_page = total // size if total % size == 0 else total // size + 1
 			for page in range(1, all_page + 1):
+				# 深拷贝request
+				copy_request = copy.copy(request)
+				# 如果request.data等于传入的data 或 loads后的data等于data
 				if request.data == data or json.loads(request.data) == data:
-					request.data = data
+					# 判断一下request.data的类型
+					if isinstance(request.data,str):
+						copy_request.data = json.loads(copy_request.data)
+					copy_request.data[key] = page
 				elif request.params == data:
-					request.params = data
+					copy_request.params[key] = page
 				else:
 					raise WrongParameter('<Wrong parameter type, data can only be an attribute in the request>')
-				data[key] = page
-				yield request
+				yield copy_request
 
 	@property
 	def retry(self):

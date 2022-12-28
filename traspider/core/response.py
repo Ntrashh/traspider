@@ -38,3 +38,14 @@ class Response:
 			return ElementIter(xpath_result)
 		else:
 			return Element(xpath_result)
+
+
+	def __iter__(self):
+		return (i for i in (self.status_code,self.request))
+
+	def __repr__(self):
+		class_name = type(self).__name__
+		return "{}(method:{!r}, request:{!r})".format(
+			class_name,
+			*self
+		)
