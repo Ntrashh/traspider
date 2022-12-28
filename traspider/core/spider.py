@@ -1,3 +1,5 @@
+import json
+
 from loguru import logger
 
 from traspider import Engine
@@ -21,7 +23,7 @@ class Spider:
 			elif isinstance(url,dict):
 				if url.get("url") is None:
 					raise ValueError(f"The url attribute in urls cannot be empty:{url}")
-				yield Request(url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parser)
+				yield Request(method=url.get("method"),url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parser)
 			else:
 				raise ValueError("<Only dictionaries and strings can be stored in urls>")
 
@@ -53,15 +55,14 @@ class Spider:
 				raise WrongParameter('<data cannot be None>')
 			all_page = total // size if total % size == 0 else total // size + 1
 			for page in range(1, all_page + 1):
-				data[key] = page
-				if request.data == data:
+				if request.data == data or json.loads(request.data) == data:
 					request.data = data
-					yield request
 				elif request.params == data:
-					request.params = page
-					yield request
+					request.params = data
 				else:
 					raise WrongParameter('<Wrong parameter type, data can only be an attribute in the request>')
+				data[key] = page
+				yield request
 
 	@property
 	def retry(self):
