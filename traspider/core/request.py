@@ -2,7 +2,7 @@ from urllib import parse
 
 
 class Request:
-    def __init__(self, url, callback, method=None, headers=None, params=None, data=None, proxy=None, timeout=3,
+    def __init__(self, url, callback=None, method=None, headers=None, params=None, data=None, proxy=None, timeout=3,
                  meta={}):
         self.url = url
         self.method = method or "GET"
