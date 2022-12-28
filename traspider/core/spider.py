@@ -19,16 +19,16 @@ class Spider:
 	def start_request(self):
 		for url in self.urls:
 			if isinstance(url,str):
-				yield Request(url, callback=self.parser)
+				yield Request(url, callback=self.parse)
 			elif isinstance(url,dict):
 				if url.get("url") is None:
 					raise ValueError(f"The url attribute in urls cannot be empty:{url}")
-				yield Request(method=url.get("method"),url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parser)
+				yield Request(method=url.get("method"),url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parse)
 			else:
 				raise ValueError("<Only dictionaries and strings can be stored in urls>")
 
 
-	def parser(self, response: Response, request: Request):
+	def parse(self, response: Response, request: Request):
 		pass
 
 	def download_middleware(self, request):

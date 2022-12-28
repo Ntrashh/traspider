@@ -51,6 +51,9 @@ class Engine:
 		:return:
 		"""
 		item_list = []
+		# 如果callback为空的情况下,回调方法为默认的parse
+		if request.callback is None:
+			request.callback = self.spider.parse
 		callback_results = request.callback(response, request)
 		# 如果callback的结果为空再次不会
 		if callback_results is None:
