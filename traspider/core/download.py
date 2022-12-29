@@ -7,7 +7,7 @@ from traspider.core.response import Response
 
 
 class Download:
-	def __init__(self, retry,time_out):
+	def __init__(self, retry, time_out):
 
 		self.retry = retry
 		self.time_out = time_out
@@ -22,7 +22,9 @@ class Download:
 		在这里可以处理下载前和下载后的处理
 		:return:
 		"""
-		request = await spider.download_middleware(request)
+		# 如果不是重试的request就放入到下载中间件中
+		if not request.retry_:
+			request = await spider.download_middleware(request)
 		response = await self.crawl(request)
 		# TODO 在这里做下载中间件之后的处理
 		return response
@@ -44,10 +46,10 @@ class Download:
 					params=request.params,
 					data=request.data,
 					proxy=request.proxy,
-					timeout = self.time_out
+					timeout=self.time_out
 				)
 				logger.info(f"""<response: <Response {response.status}>> url:{request.url}
-								请求次数:{self.error.get(fingerprint_md5, 0)+1}""")
+								请求次数:{self.error.get(fingerprint_md5, 0) + 1}""")
 				self.dedup.add(self.__encrypt_request(request))
 				return Response(content=await response.read(), request=request, meta=request.meta, response=response)
 		except aiohttp.client_exceptions.ClientOSError as e:
@@ -57,7 +59,9 @@ class Download:
 		except asyncio.exceptions.TimeoutError as e:
 			logger.error("请求超时!")
 		if not self.__error_retry(fingerprint_md5):
-			logger.info(f"<重试请求次数:{self.error.get(fingerprint_md5, 0)}  url={request.url} params={request.params} data={request.data}>")
+			logger.info(
+				f"<重试请求次数:{self.error.get(fingerprint_md5, 0)}  url={request.url} params={request.params} data={request.data}>")
+			request.retry_ = True
 			return request
 
 	def __error_retry(self, key):
