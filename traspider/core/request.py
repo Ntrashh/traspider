@@ -1,16 +1,18 @@
 import json
 from urllib import parse
 
+import aiohttp
+
 
 class Request:
 	def __init__(self, url, callback=None, method=None, headers=None, params=None, data=None, proxy=None, timeout=3,
 				 meta={}):
+		self.__proxy = proxy
 		self.url = url
 		self.method = method or "GET"
 		self.headers = headers
 		self.params = params
 		self.__data = data
-		self.proxy = proxy
 		self.timeout = timeout
 		self.callback = callback
 		self.meta = meta
@@ -48,6 +50,40 @@ class Request:
 			self.__retry_ = value
 		else:
 			raise ValueError('<retry_ must be a bool type>')
+
+
+	@property
+	def proxy(self):
+		if hasattr(self,"_Request__proxy"):
+			return self.__proxy
+		return None
+
+	@proxy.setter
+	def proxy(self,value):
+		if isinstance(value,dict):
+			if set(value.keys()) == set(["username","password","tunnel"]):
+				self.proxy_auth = {
+					"username":value["username"],
+					"password":value["password"]
+				}
+				self.__proxy = value["tunnel"]
+			else:
+				raise ValueError('<Tunnel proxy must contain "username", "password", "tunnel">')
+		elif isinstance(value,str):
+			self.__proxy = value
+		else:
+			raise ValueError('<Proxy only supports dict and str>')
+
+	@property
+	def proxy_auth(self):
+		if hasattr(self,"_Request__proxy_auth"):
+			return self.__proxy_auth
+		return None
+
+
+	@proxy_auth.setter
+	def proxy_auth(self,value):
+		self.__proxy_auth = aiohttp.BasicAuth(value["username"], value["password"])
 
 	def __iter__(self):
 		return (i for i in
