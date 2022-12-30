@@ -55,7 +55,8 @@ if __name__ == "__main__":
 > traspider这个项目开始之初就是为了爬虫在开发一些简单的项目能够更轻更快,所以对大型项目支持还是不够好。如果开发的是大型爬虫项目,推荐你使用[feapder](https://github.com/Boris-code/feapder)和[scrapy](https://github.com/scrapy/scrapy)
 
 如果你在使用过程中有什么问题或者有什么建议可以联系我
-![wechat](https://user-images.githubusercontent.com/109586486/210029477-9ff2ca2f-9ed9-405a-a951-026482519852.jpg)
+
+![wechat](https://user-images.githubusercontent.com/109586486/210029580-4bb2f7bb-ed19-4971-ad0a-788aa659e2ff.jpg)
 
 
 
