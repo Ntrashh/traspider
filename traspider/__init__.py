@@ -23,4 +23,4 @@ __all__ = [
 	"Encrypt"
 ]
 
-__version__ = "0.0.05"
+__version__ = "0.0.06"
