@@ -1,5 +1,5 @@
 # traspider
-
+[![Downloads](https://static.pepy.tech/badge/traspider)](https://pepy.tech/project/traspider)       [![Downloads](https://static.pepy.tech/badge/traspider/month)](https://pepy.tech/project/traspider)     [![Downloads](https://static.pepy.tech/badge/traspider/week)](https://pepy.tech/project/traspider)
 ## 简介
 
 traspider是一个开箱即用的轻量爬虫框架
