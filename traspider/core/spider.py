@@ -55,7 +55,7 @@ class Spider:
 			if data is None:
 				raise WrongParameter('<data cannot be None>')
 			all_page = total // size if total % size == 0 else total // size + 1
-			for page in range(1, all_page + 1):
+			for page in range(2, all_page + 1):
 				# 深拷贝request
 				copy_request = copy.copy(request)
 				# 如果request.data等于传入的data 或 loads后的data等于data
