@@ -1,10 +1,6 @@
 import copy
 import json
-
-from loguru import logger
-
 from traspider import Engine
-
 from traspider.core.request import Request
 from traspider.core.response import Response
 from traspider.util.exception import WrongParameter
@@ -13,9 +9,6 @@ from traspider.util.node_vm.node import Node
 
 
 class Spider:
-	def __init__(self):
-		self.urls = []
-
 
 	def start_request(self):
 		for url in self.urls:
@@ -81,6 +74,19 @@ class Spider:
 		if value < 0 and not isinstance(value, int):
 			raise ValueError('<The retry attribute must be an integer and greater than 0>')
 		self.__retry = value
+
+	@property
+	def urls(self):
+		if hasattr(self, "_Spider__urls"):
+			return self.__urls
+		return []
+
+	@urls.setter
+	def urls(self,val):
+		if not val is None:
+			self.__urls = val
+		self.__urls = []
+
 
 	@property
 	def paging(self):
