@@ -33,6 +33,8 @@ class Engine:
 		:param request:
 		:return:
 		"""
+		if request is None:
+			return
 		response = await self.download.download(self.spider, request)
 		# 如果下载器下载失败response为空
 		if response is None:
@@ -72,7 +74,6 @@ class Engine:
 		self.__task_list.append(future)
 		if len(self.__task_list) == self.spider.task_num or not await self.scheduler.scheduler_qsize():
 			# 获取所有完成任务和未完成任务
-
 			dones, pending = await asyncio.wait(self.__task_list)
 			# 如果有未完成任务在此等待
 			while pending:

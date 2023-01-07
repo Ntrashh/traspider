@@ -10,7 +10,9 @@ class Scheduler:
 		取出下一个请求的对象
 		:return:
 		"""
-		return await self.queue.get()
+		if self.queue.qsize():
+			return await self.queue.get()
+		return None
 
 	async def add_scheduler(self,request):
 		"""

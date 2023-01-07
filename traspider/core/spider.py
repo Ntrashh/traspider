@@ -95,7 +95,8 @@ class Spider:
 	def urls(self,val):
 		if not val is None:
 			self.__urls = val
-		self.__urls = []
+		else:
+			self.__urls = []
 
 
 	@property
