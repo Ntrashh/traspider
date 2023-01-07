@@ -192,7 +192,7 @@ class Spider:
 	def time_out(self):
 		if hasattr(self, "_Spider__time_out"):
 			return self.__time_out
-		return 5
+		return 10
 
 	@time_out.setter
 	def time_out(self, value):

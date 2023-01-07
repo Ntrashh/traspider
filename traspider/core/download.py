@@ -59,6 +59,8 @@ class Download:
 			pass
 		except aiohttp.client_exceptions.ServerDisconnectedError as e:
 			pass
+		except aiohttp.client_exceptions.TooManyRedirects as e:
+			pass
 		except asyncio.exceptions.TimeoutError as e:
 			logger.error("请求超时!")
 		except aiohttp.client_exceptions.ClientHttpProxyError as e:
