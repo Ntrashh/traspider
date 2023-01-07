@@ -10,6 +10,16 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 
+	def __init__(self):
+		self.__save_type = None
+		self.__task_num = None
+		self.__node = None
+		self.__mysql_setting = None
+		self.__save_path = None
+		self.__paging = None
+		self.__urls = None
+		self.__retry = None
+
 	def start_request(self):
 		for url in self.urls:
 			if isinstance(url,str):
