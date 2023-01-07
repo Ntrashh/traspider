@@ -53,7 +53,10 @@ class ElementIter(Element):
 
     def __iter__(self):
         for element in self.element:
-            yield Element(element)
+            if isinstance(element, str):
+                yield element
+            else:
+                yield Element(element)
 
     def __repr__(self):
         return str(self.element)
