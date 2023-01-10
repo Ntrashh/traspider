@@ -11,14 +11,22 @@ from traspider.util.node_vm.node import Node
 class Spider:
 
 	def __init__(self):
-		self.__save_type = None
-		self.__task_num = None
+		self.__save_type = ""
+		self.__task_num = 100
+		self.__time_out = 10
 		self.__node = None
-		self.__mysql_setting = None
-		self.__save_path = None
-		self.__paging = None
-		self.__urls = None
-		self.__retry = None
+		self.__mysql_setting = {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"table": "",
+		}
+		self.__save_path = ""
+		self.__paging = True
+		self.__urls = []
+		self.__retry = 100
 
 	def start_request(self):
 		for url in self.urls:
@@ -75,9 +83,7 @@ class Spider:
 
 	@property
 	def retry(self):
-		if hasattr(self, "_Spider__retry"):
-			return self.__retry
-		return 100
+		return self.__retry
 
 	@retry.setter
 	def retry(self, value):
@@ -87,9 +93,8 @@ class Spider:
 
 	@property
 	def urls(self):
-		if hasattr(self, "_Spider__urls"):
-			return self.__urls
-		return []
+
+		return self.__urls
 
 	@urls.setter
 	def urls(self,val):
@@ -101,9 +106,7 @@ class Spider:
 
 	@property
 	def paging(self):
-		if hasattr(self, "_Spider__paging"):
-			return self.__paging
-		return True
+		return self.__paging
 
 	@paging.setter
 	def paging(self, value):
@@ -111,16 +114,7 @@ class Spider:
 
 	@property
 	def mysql_setting(self):
-		if hasattr(self, "_Spider__mysql_setting"):
-			return self.__mysql_setting
-		return {
-			"host": "",
-			"port": "",
-			"user": "",
-			"password": "",
-			"db": "",
-			"table": "",
-		}
+		return self.__mysql_setting
 
 	@mysql_setting.setter
 	def mysql_setting(self, value):
@@ -153,9 +147,8 @@ class Spider:
 
 	@property
 	def save_path(self):
-		if hasattr(self, "_Spider__save_path"):
-			return self.__save_path
-		return ""
+
+		return self.__save_path
 
 	@save_path.setter
 	def save_path(self, value: str):
@@ -177,15 +170,11 @@ class Spider:
 
 	@property
 	def save_type(self):
-		if hasattr(self, "_Spider__save_type"):
-			return self.__save_type
-		return ""
+		return self.__save_type
 
 	@property
 	def node(self):
-		if hasattr(self,"_Spider__node"):
-			return self.__node
-		return None
+		return self.__node
 
 	@node.setter
 	def node(self,value):
@@ -195,9 +184,7 @@ class Spider:
 
 	@property
 	def task_num(self):
-		if hasattr(self, "_Spider__task_num"):
-			return self.__task_num
-		return 100
+		return self.__task_num
 
 	@task_num.setter
 	def task_num(self,value):
@@ -207,9 +194,7 @@ class Spider:
 
 	@property
 	def time_out(self):
-		if hasattr(self, "_Spider__time_out"):
-			return self.__time_out
-		return 10
+		return self.__time_out
 
 	@time_out.setter
 	def time_out(self, value):
