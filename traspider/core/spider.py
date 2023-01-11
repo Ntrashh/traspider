@@ -10,35 +10,22 @@ from traspider.util.node_vm.node import Node
 
 class Spider:
 
-	def __init__(self):
-		self.__save_type = ""
-		self.__task_num = 100
-		self.__time_out = 10
-		self.__node = None
-		self.__mysql_setting = {
-			"host": "",
-			"port": "",
-			"user": "",
-			"password": "",
-			"db": "",
-			"table": "",
-		}
-		self.__save_path = ""
-		self.__paging = True
-		self.__urls = []
-		self.__retry = 100
-
 	def start_request(self):
 		for url in self.urls:
-			if isinstance(url,str):
+			if isinstance(url, str):
 				yield Request(url, callback=self.parse)
-			elif isinstance(url,dict):
+			elif isinstance(url, dict):
 				if url.get("url") is None:
 					raise ValueError(f"The url attribute in urls cannot be empty:{url}")
-				yield Request(method=url.get("method"),url=url.get("url"),params=url.get("params"),data=url.get("data"),callback=self.parse)
+				yield Request(
+					method=url.get("method"),
+					url=url.get("url"),
+					params=url.get("params"),
+					data=url.get("data"),
+					callback=self.parse
+				)
 			else:
 				raise ValueError("<Only dictionaries and strings can be stored in urls>")
-
 
 	def parse(self, response: Response, request: Request):
 		pass
@@ -50,7 +37,7 @@ class Spider:
 	def call_node(self, func, *args, **kwargs):
 		return self.node.call_node(func, *args, **kwargs)
 
-	def generate_total_Request(self, request=None, data=None, total=None, size=None, key=None):
+	def generate_total_request(self, request=None, data=None, total=None, size=None, key=None):
 		if not self.paging:
 			return
 		self.paging = False
@@ -72,7 +59,7 @@ class Spider:
 				# 如果request.data等于传入的data 或 loads后的data等于data
 				if request.data == data or json.loads(request.data) == data:
 					# 判断一下request.data的类型
-					if isinstance(request.data,str):
+					if isinstance(request.data, str):
 						copy_request.data = json.loads(copy_request.data)
 					copy_request.data[key] = page
 				elif request.params == data:
@@ -83,7 +70,9 @@ class Spider:
 
 	@property
 	def retry(self):
-		return self.__retry
+		if hasattr(self, "_Spider__retry"):
+			return self.__retry
+		return 100
 
 	@retry.setter
 	def retry(self, value):
@@ -93,20 +82,22 @@ class Spider:
 
 	@property
 	def urls(self):
-
-		return self.__urls
+		if hasattr(self, "_Spider__urls"):
+			return self.__urls
+		return []
 
 	@urls.setter
-	def urls(self,val):
-		if not val is None:
+	def urls(self, val):
+		if val is not None:
 			self.__urls = val
 		else:
 			self.__urls = []
 
-
 	@property
 	def paging(self):
-		return self.__paging
+		if hasattr(self, "_Spider__paging"):
+			return self.__paging
+		return True
 
 	@paging.setter
 	def paging(self, value):
@@ -114,7 +105,16 @@ class Spider:
 
 	@property
 	def mysql_setting(self):
-		return self.__mysql_setting
+		if hasattr(self, "_Spider__mysql_setting"):
+			return self.__mysql_setting
+		return {
+			"host": "",
+			"port": "",
+			"user": "",
+			"password": "",
+			"db": "",
+			"table": "",
+		}
 
 	@mysql_setting.setter
 	def mysql_setting(self, value):
@@ -147,8 +147,9 @@ class Spider:
 
 	@property
 	def save_path(self):
-
-		return self.__save_path
+		if hasattr(self, "_Spider__save_path"):
+			return self.__save_path
+		return ""
 
 	@save_path.setter
 	def save_path(self, value: str):
@@ -170,38 +171,45 @@ class Spider:
 
 	@property
 	def save_type(self):
-		return self.__save_type
+		if hasattr(self, "_Spider__save_type"):
+			return self.__save_type
+		return ""
 
 	@property
 	def node(self):
-		return self.__node
+		if hasattr(self, "_Spider__node"):
+			return self.__node
+		return None
 
 	@node.setter
-	def node(self,value):
-		if not isinstance(value,Node):
+	def node(self, value):
+		if not isinstance(value, Node):
 			raise ValueError('<The node attribute must be of Node class>')
 		self.__node = value
 
 	@property
 	def task_num(self):
-		return self.__task_num
+		if hasattr(self, "_Spider__task_num"):
+			return self.__task_num
+		return 100
 
 	@task_num.setter
-	def task_num(self,value):
+	def task_num(self, value):
 		if value < 1 or value > 100:
 			raise ValueError("task_num can only be between 1-100")
 		self.__task_num = value
 
 	@property
 	def time_out(self):
-		return self.__time_out
+		if hasattr(self, "_Spider__time_out"):
+			return self.__time_out
+		return 10
 
 	@time_out.setter
 	def time_out(self, value):
-		if value < 1 or value > 20:
+		if value < 1 or value > 30:
 			raise ValueError("time_out can only be between 1-20")
 		self.__time_out = value
-
 
 	def start(self):
 		engine = Engine(spider=self)
