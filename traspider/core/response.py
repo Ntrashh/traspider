@@ -12,15 +12,17 @@ class Response:
 		self.request = request
 		self.meta = meta
 		self.__response = response
-	
+
 	@property
 	def status_code(self):
 		return self.__response.status
 
+	@property
 	def json(self):
-		json_data =  json.loads(self.content.decode())
+		json_data = json.loads(self.content.decode())
 		return TraJson(json_data)
 
+	@property
 	def text(self, encoding=None):
 		"""自动解析html编码"""
 		if encoding is None:
@@ -34,14 +36,13 @@ class Response:
 	def xpath(self, query):
 		root = etree.HTML(self.text())
 		xpath_result = root.xpath(query)
-		if isinstance(xpath_result,list):
+		if isinstance(xpath_result, list):
 			return ElementIter(xpath_result)
 		else:
 			return Element(xpath_result)
 
-
 	def __iter__(self):
-		return (i for i in (self.status_code,self.request))
+		return (i for i in (self.status_code, self.request))
 
 	def __repr__(self):
 		class_name = type(self).__name__
