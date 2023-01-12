@@ -6,10 +6,7 @@ traspider是一个开箱即用的轻量爬虫框架
 
 如果你需要写一个小的爬虫,使用traspider会让你事半功倍
 
-github地址 : https://github.com/Ntrashh/traspider
-
-文档地址: https://ntrashh.github.io/traspider/
-
+github地址:https://github.com/Ntrashh/traspider
 
 ### 环境要求
  - Python 3.7.0+
