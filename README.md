@@ -79,3 +79,8 @@ yinghui0214@163.com
 [scrapy](https://github.com/scrapy/scrapy)
 
 [huangjin](https://github.com/xianyucoder)
+
+
+
+##
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PyCharm.png" alt="PyCharm logo."  width="30%" >
